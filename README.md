@@ -38,7 +38,9 @@ ISOs are named in DD-MM-YYYY date format for easy identification.
 
 ### Device Configuration
 
-- Tailscale: [ADD INSTRUCTIONS]
+We use another USB drive that contains the encryption key for API secrets (managed by chezmoi)
+- Tailscale: [follow instructions](docs/tailscale.md)
+- Decrypting API keys with Age: [follow instructions](docs/age-encrypt-secrets.md)
 
 ### Manual Steps
 
