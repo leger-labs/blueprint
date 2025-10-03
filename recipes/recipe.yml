@@ -59,6 +59,12 @@ modules:
     nofile-limits: true
     brew-analytics: false
 
+  - type: justfiles
+    config:
+      include:
+        - setup.just
+      validate: false
+
   - type: default-flatpaks
     configurations:
       - notify: true
