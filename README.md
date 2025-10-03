@@ -6,7 +6,7 @@ Using the Framework Desktop simultaneously as personal desktop AND a secure home
 - Dedicated Quadlets module to automate podman quadlets management
 - Framework Desktop-specific adjustments:
     - Press F2 during early boot to enter BIOS  → Set minimum VRAM (static allocation). 
-    - 
+    - Optimized kargs module with `amdttm`
 - Desktop behavior:
     - Auto-login with SDDM
     - Enabled --user quadlet lingering by default
@@ -36,6 +36,10 @@ ISOs are named in DD-MM-YYYY date format for easy identification.
 - Click "Begin Installation"
 - After installation completes, reboot and enjoy your new Duo Linux system
 
+### Device Configuration
+
+- Tailscale: [ADD INSTRUCTIONS]
+
 ### Manual Steps
 
 - Sign in to github wih `gh auth login`
@@ -47,12 +51,11 @@ git config --global user.email "thomas@mecattaf.dev"
 - Authenticate to google chrome and [follow instructions](docs/chrome.md)
 - Authenticate to gh from the CLI
 - Set icon and gtk theme with GTK Settings
-- If flatpaks are not loaded automatically: ``
+- If flatpaks are not loaded automatically:
 ```
 mako #to have a notification daemon running
 bluebuild-flatpak-manager apply all
 ```
-- Authenticate into tailscale (using github account)
 
 ### Enabling systemd services
 
@@ -100,3 +103,29 @@ View the list of available builds by entering:
 ```
 skopeo list-tags docker://ghcr.io/leger-labs/blueprint | sort -rV
 ```
+
+## ISO Verification
+
+### 1. Download the public key
+```bash
+curl -O https://raw.githubusercontent.com/leger-labs/blueprint/main/.github/keys/blueprint-public.gpg
+gpg --import blueprint-public.gpg
+```
+
+### 2. Download ISO and checksum
+```bash
+# Download from R2
+curl -O https://downloads.leger.run/blueprint-YYYYMMDD.iso
+curl -O https://downloads.leger.run/blueprint-YYYYMMDD.iso-CHECKSUM
+```
+
+### 3. Verify signature and checksum
+```bash
+# Verify the signature on the checksum file
+gpg --verify blueprint-YYYYMMDD.iso-CHECKSUM
+
+# If signature is good, verify the ISO checksum
+sha256sum -c blueprint-YYYYMMDD.iso-CHECKSUM
+```
+
+If both checks pass, your ISO is authentic and untampered! ✅
