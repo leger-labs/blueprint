@@ -1,0 +1,53 @@
+type: fonts
+fonts:
+
+  nerd-fonts:
+    - DejaVuSansMono
+    - FiraCode
+    - Hack
+    - JetBrainsMono
+    - SourceCodePro
+    - Iosevka
+    - NerdFontsSymbolsOnly
+    - IBMPlexMono
+
+  google-fonts:
+    - Roboto
+    - Open Sans
+    - Work Sans
+    - Outfit
+    - Space Grotesk
+    - Inter
+    - IBM Plex Sans
+
+  url-fonts:
+    # Apple Fonts
+    - name: Apple-SF
+      url: https://github.com/mecattaf/San-Francisco-family/releases/download/v1.0/apple-sf-nerd-patched.zip
+    - name: SFMono-Nerd-Font-Ligaturized
+      url: https://github.com/mecattaf/San-Francisco-family/releases/download/v1.0/SFMono-Liga.zip
+    # Maple Font Variable Versions
+    - name: MapleMono-Variable
+      url: https://github.com/subframe7536/maple-font/releases/latest/download/MapleMono-Variable.zip
+    - name: MapleMonoNormal-Variable
+      url: https://github.com/subframe7536/maple-font/releases/latest/download/MapleMonoNormal-Variable.zip
+    
+    # Maple Font TTF Versions
+    - name: MapleMono-TTF
+      url: https://github.com/subframe7536/maple-font/releases/latest/download/MapleMono-TTF.zip
+    - name: MapleMono-TTF-AutoHint
+      url: https://github.com/subframe7536/maple-font/releases/latest/download/MapleMono-TTF-AutoHint.zip
+    - name: MapleMonoNormal-TTF
+      url: https://github.com/subframe7536/maple-font/releases/latest/download/MapleMonoNormal-TTF.zip
+    - name: MapleMonoNormal-TTF-AutoHint
+      url: https://github.com/subframe7536/maple-font/releases/latest/download/MapleMonoNormal-TTF-AutoHint.zip
+    
+    # Maple Font Nerd Font (NF) Versions
+    - name: MapleMono-NF-unhinted
+      url: https://github.com/subframe7536/maple-font/releases/latest/download/MapleMono-NF-unhinted.zip
+    - name: MapleMono-NF
+      url: https://github.com/subframe7536/maple-font/releases/latest/download/MapleMono-NF.zip
+    - name: MapleMonoNormal-NF-unhinted
+      url: https://github.com/subframe7536/maple-font/releases/latest/download/MapleMonoNormal-NF-unhinted.zip
+    - name: MapleMonoNormal-NF
+      url: https://github.com/subframe7536/maple-font/releases/latest/download/MapleMonoNormal-NF.zip

@@ -1,0 +1,10 @@
+[SddmGreeterTheme]
+Name=Classic NoCursor
+Description=Minimal OLED-optimized SDDM theme
+Screenshot=screenshot.png
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=classic_nocursor
+Theme-API=2.2
+QtVersion=6
+License=MIT

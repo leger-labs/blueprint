@@ -1,0 +1,12 @@
+[Unit]
+Description=Enable autologin for SDDM
+After=sddm-boot.service
+Before=sddm.service display-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/etc/sddm/sddm-autologin
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

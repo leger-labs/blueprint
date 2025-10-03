@@ -1,0 +1,7 @@
+type: dnf
+repos:
+  copr:
+    - errornointernet/quickshell
+install:
+  packages:
+    - quickshell

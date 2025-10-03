@@ -1,0 +1,12 @@
+[Unit]
+Description=Enable lingering for default user
+After=sddm-boot.service
+Before=sddm.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/etc/libexec/enable-linger
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

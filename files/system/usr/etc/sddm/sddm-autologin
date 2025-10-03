@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+
+USER=$(id -nu 1000)
+HOME=$(getent passwd $USER | cut -d: -f6)
+
+# SDDM config
+SDDM_CONF='/etc/sddm.conf.d/scroll.conf'
+
+# Set the user for autologin
+sed -i 's/.*User=.*/User='${USER}'/g' ${SDDM_CONF}

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Scroll
+Comment=A scrolling window manager based on sway - like PaperWM or niri
+Exec=scroll
+Type=Application
+DesktopNames=scroll

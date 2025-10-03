@@ -1,45 +1,81 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-# image will be published to ghcr.io/<user>/<name>
-name: template
-# description will be included in the image's metadata
-description: This is my personal OS image.
+name: blueprint
+description: The next-generation Fedora-based workstation — built for the Framework Desktop with AMD Ryzen™ 9 395 Max+ with 128GB RAM
+base-image: ghcr.io/ublue-os/base-main
+image-version: 42
 
-# the base image to build on top of (FROM) and the version tag to use
-base-image: ghcr.io/ublue-os/silverblue-main
-image-version: 42 # latest is also supported if you want new updates ASAP
-
-# module configuration, executed in order
-# you can include multiple instances of the same module
 modules:
+  - from-file: base.yml
+  - from-file: copr.yml
+  - from-file: quickshell.yml
+
+  - type: dnf
+    remove:
+      packages:
+        - firefox
+        - firefox-langpacks
+        - virtualbox-guest-additions
+        - toolbox
+        - nvtop
+        - sway
+        - yggdrasil
+        - adcli 
+        - libdnf-plugin-subscription-manager 
+        - python3-subscription-manager-rhsm 
+        - subscription-manager 
+        - subscription-manager-rhsm-certificates 
+
+  - type: kargs
+    kargs:
+      - amd_iommu=off
+      - amdttm.pages_limit=27648000
+      - amdttm.page_pool_size=13824000
+
   - type: files
     files:
       - source: system
-        destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
+        destination: /
 
-  - type: dnf
-    repos:
-      copr:
-        - atim/starship
-    install:
-      packages:
-        - micro
-        - starship
-    remove:
-      packages:
-        # example: removing firefox (in favor of the flatpak)
-        # "firefox" is the main package, "firefox-langpacks" is a dependency
-        - firefox
-        - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
+  - from-file: fonts.yml
+
+  - type: systemd
+    system:
+      enabled:
+        - sddm-boot.service
+        - enable-linger.service
+        - autologin.service
+        - tailscaled.service
+      disabled: []
+
+  - type: chezmoi
+    repository: "https://github.com/mecattaf/dotfiles"
+    run-every: '1d'
+    wait-after-boot: '5m'
+    disable-init: false
+    disable-update: false
+
+  - type: brew
+    nofile-limits: true
+    brew-analytics: false
 
   - type: default-flatpaks
     configurations:
-      - notify: true # Send notification after install/uninstall is finished (true/false)
-        scope: system
-        # If no repo information is specified, Flathub will be used by default
-        install: # system flatpaks we want all users to have and not remove
+      - notify: true
+        scope: user
+        repo:
+          url: https://dl.flathub.org/repo/flathub.flatpakrepo
+          name: flathub
+        install:
+          - com.google.Chrome
+          - it.mijorus.gearlever
+          - com.hunterwittenborn.Celeste
+          - it.mijorus.collector
+          - com.obsproject.Studio
+          - com.obsproject.Studio.Plugin.OBSVkCapture
+          - org.gnome.Lollypop
           - org.mozilla.firefox
-          - org.gnome.Loupe
-      - scope: user # Also add Flathub user repo, but no user packages
+          # - org.freedesktop.Platform.VulkanLayer.OBSVkCapture
+          # - org.freedesktop.Platform.GStreamer.gstreamer-vaapi
 
-  - type: signing # this sets up the proper policy & signing files for signed images to work fully
+  - type: signing

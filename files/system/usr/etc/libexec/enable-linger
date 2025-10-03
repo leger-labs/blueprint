@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+
+USER=$(id -nu 1000)
+
+# Enable lingering for the user
+loginctl enable-linger ${USER}

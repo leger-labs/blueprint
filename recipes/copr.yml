@@ -1,0 +1,17 @@
+type: dnf
+repos:
+  copr:
+    - mecattaf/duoRPM
+install:
+  packages:
+    - atuin
+    - bibata-cursor-themes
+    - catppuccin-extras
+    - cliphist
+    - eza
+    - lisgd
+    - nwg-clipman
+    - nwg-look
+    - scroll
+    - starship
+    - wl-gammarelay-rs
