@@ -4,6 +4,8 @@ Using the Framework Desktop simultaneously as personal desktop AND a secure home
 
 # Features:
 - Dedicated Quadlets module to automate podman quadlets management
+- Verified ISO installation process
+- Works with Secure Boot
 - Framework Desktop-specific adjustments:
     - Press F2 during early boot to enter BIOS  → Set minimum VRAM (static allocation). 
     - Optimized kargs module with `amdttm`

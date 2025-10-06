@@ -165,3 +165,4 @@ install:
     - cockpit-selinux
     - cockpit-storaged
     - cockpit-system
+    - pcp-zeroconf
