@@ -63,7 +63,6 @@ modules:
     config:
       include:
         - setup.just
-      validate: false
 
   - type: default-flatpaks
     configurations:
