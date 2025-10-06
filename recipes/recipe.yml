@@ -60,8 +60,7 @@ modules:
     brew-analytics: false
 
   - type: justfiles
-    config:
-      include:
+    include:
         - setup.just
 
   - type: default-flatpaks
