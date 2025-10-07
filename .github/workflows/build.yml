@@ -15,9 +15,9 @@ jobs:
     name: Build Custom Image
     runs-on: ubuntu-latest
     permissions:
+      actions: read
       contents: read
       packages: write
-      packages: read
       id-token: write
     strategy:
       fail-fast: false # stop GH from cancelling all matrix builds if one fails
