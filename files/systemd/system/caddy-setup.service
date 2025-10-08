@@ -1,0 +1,13 @@
+[Unit]
+Description=Setup Caddy user configuration path
+Documentation=https://caddyserver.com/docs/
+After=enable-linger.service
+Before=caddy.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/etc/libexec/caddy-setup
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

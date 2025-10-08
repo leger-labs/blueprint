@@ -44,8 +44,10 @@ modules:
       enabled:
         - sddm-boot.service
         - enable-linger.service
+        - caddy-setup.service
         - autologin.service
         - tailscaled.service
+        - caddy.service
         - systemd-resolved.service
       disabled: []
 
