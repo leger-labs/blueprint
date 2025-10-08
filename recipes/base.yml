@@ -158,6 +158,7 @@ install:
     # networking
     - caddy
     - tailscale
+    - systemd-resolved
     - cockpit
     - cockpit-machines
     - cockpit-networkmanager
