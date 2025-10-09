@@ -141,6 +141,7 @@ install:
     # Local AI functionality
     - ollama
     - ramalama
+    - whisper-cpp
     # added from ax-shell instructions
     - tesseract
     - webp-pixbuf-loader 
