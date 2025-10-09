@@ -31,6 +31,8 @@ modules:
       - amd_iommu=off
       - amdttm.pages_limit=27648000
       - amdttm.page_pool_size=13824000
+# - amdgpu.gttsize=131072     → 128 GiB unified memory (131072 MiB)
+# - ttm.pages_limit=33554432  → 128 GiB pinned memory (33554432 × 4 KiB)
 
   - type: files
     files:
@@ -44,10 +46,8 @@ modules:
       enabled:
         - sddm-boot.service
         - enable-linger.service
-        - caddy-setup.service
         - autologin.service
         - tailscaled.service
-        - caddy.service
         - systemd-resolved.service
       disabled: []
 

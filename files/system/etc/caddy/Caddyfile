@@ -1,6 +1,0 @@
-{
-    admin localhost:2019
-}
-
-# User configurations only
-import {$CADDY_USER_CONFIG}/*.caddy
