@@ -2,57 +2,72 @@
 # Post-install setup commands for blueprint homeserver
 # Copyright 2025 Thomas Mecattaf
 
-# Decrypt age key from USB drive
-decrypt-key:
+# Decrypt age key from USB and apply chezmoi dotfiles
+decrypt-and-apply:
     #!/usr/bin/bash
-    echo "TODO: Implement age key decryption from USB"
-    # USB_MOUNT="/run/media/$USER"
-    # KEY_FILE=$(find "$USB_MOUNT" -name "age-key.encrypted" 2>/dev/null | head -n 1)
-    # if [ -z "$KEY_FILE" ]; then
-    #     echo "❌ Error: Encrypted age key not found on USB"
-    #     exit 1
-    # fi
-    # TODO: Decrypt and place in ~/.config/chezmoi/key.txt
+    set -e
 
-# Setup Tailscale using OAuth credentials from config file
+    echo "🔑 Copying age key from USB and applying dotfiles..."
+
+    USB_LABEL="SECRET-KEY"
+    USB_MOUNT="/run/media/$USER/$USB_LABEL"
+    KEY_SOURCE="$USB_MOUNT/age-key.txt"
+    DEST_DIR="$HOME/.config/chezmoi"
+    DEST_KEY="$DEST_DIR/key.txt"
+
+    # Ensure destination directory exists
+    mkdir -p "$DEST_DIR"
+
+    # Check if USB is mounted
+    if [ ! -d "$USB_MOUNT" ]; then
+        echo "❌ USB drive '$USB_LABEL' not mounted at $USB_MOUNT"
+        exit 1
+    fi
+
+    # Check if key file exists
+    if [ ! -f "$KEY_SOURCE" ]; then
+        echo "❌ No age-key.txt found on USB at $KEY_SOURCE"
+        exit 1
+    fi
+
+    # Copy the key and set permissions
+    cp "$KEY_SOURCE" "$DEST_KEY"
+    chmod 600 "$DEST_KEY"
+    echo "✅ Age key copied to $DEST_KEY"
+
+    # Apply chezmoi dotfiles now that key is present
+    if command -v chezmoi >/dev/null 2>&1; then
+        echo "🗂 Applying chezmoi dotfiles..."
+        chezmoi apply
+        echo "✅ Dotfiles applied successfully"
+    else
+        echo "⚠️ chezmoi not installed — skipping dotfiles application"
+    fi
+
+# Setup Tailscale using OAuth credentials from environment
 setup-tailscale:
     #!/usr/bin/bash
     set -e
-    
-    CONFIG_FILE="$HOME/.config/tailscale/tailscale-oauth.conf"
-    
+
     echo "=== Tailscale Auto-Setup with OAuth ==="
-    echo
     
-    # Check if config file exists
-    if [ ! -f "$CONFIG_FILE" ]; then
-        echo "❌ Error: Config file not found at $CONFIG_FILE"
-        echo "Expected file to be created by chezmoi"
+    if [ -f "$HOME/.env" ]; then
+        source "$HOME/.env"
+        echo "✓ Environment variables loaded from ~/.env"
+    else
+        echo "❌ Error: ~/.env not found"
         exit 1
     fi
-    
-    echo "✓ Found config at: $CONFIG_FILE"
-    
-    # Source the OAuth credentials
-    source "$CONFIG_FILE"
-    
+
     if [ -z "$TAILSCALE_OAUTH_CLIENT_ID" ] || [ -z "$TAILSCALE_OAUTH_CLIENT_SECRET" ]; then
-        echo "❌ Error: OAuth credentials not found in config file"
-        echo "Make sure the file contains both TAILSCALE_OAUTH_CLIENT_ID and TAILSCALE_OAUTH_CLIENT_SECRET"
+        echo "❌ Error: Tailscale OAuth credentials missing"
         exit 1
     fi
-    
-    echo "✓ OAuth credentials loaded"
-    
-    # Enable and start Tailscale service
-    echo
+
     echo "Enabling Tailscale service..."
     sudo systemctl enable --now tailscaled
-    echo "✓ Tailscale service started"
-    
-    # Generate fresh auth key using OAuth
-    echo
-    echo "Generating fresh auth key from OAuth credentials..."
+
+    echo "Generating fresh auth key..."
     AUTH_KEY_RESPONSE=$(curl -s -X POST \
         "https://api.tailscale.com/api/v2/tailnet/-/keys" \
         -u "${TAILSCALE_OAUTH_CLIENT_ID}:${TAILSCALE_OAUTH_CLIENT_SECRET}" \
@@ -71,52 +86,63 @@ setup-tailscale:
             "expirySeconds": 900
         }')
     
-    # Extract the auth key from response
     AUTH_KEY=$(echo "$AUTH_KEY_RESPONSE" | jq -r '.key')
-    
+
     if [ -z "$AUTH_KEY" ] || [ "$AUTH_KEY" = "null" ]; then
-        echo "❌ Error: Failed to generate auth key"
+        echo "❌ Failed to generate auth key"
         echo "Response: $AUTH_KEY_RESPONSE"
         exit 1
     fi
-    
-    echo "✓ Auth key generated successfully"
-    
-    # Authenticate with Tailscale
-    echo
+
     echo "Authenticating with Tailscale..."
     sudo tailscale up --authkey="$AUTH_KEY" --accept-routes --accept-dns
-    
-    echo
-    echo "=== Setup Complete! ==="
-    echo
+
+    echo "=== Tailscale Setup Complete! ==="
     tailscale status
 
-# Setup GitHub CLI (interactive authentication)
+# Setup GitHub CLI using GH_TOKEN from environment
 setup-github:
     #!/usr/bin/bash
-    echo "TODO: Implement GitHub CLI login"
-    # gh auth login
+    set -e
+
+    echo "=== GitHub CLI Setup ==="
+    
+    if ! command -v gh &> /dev/null; then
+        echo "❌ GitHub CLI (gh) not installed"
+        exit 1
+    fi
+
+    if [ -f "$HOME/.env" ]; then
+        source "$HOME/.env"
+    else
+        echo "❌ Error: ~/.env not found"
+        exit 1
+    fi
+
+    if [ -z "$GH_TOKEN" ]; then
+        echo "❌ GH_TOKEN not set in environment"
+        exit 1
+    fi
+
+    echo "$GH_TOKEN" | gh auth login --with-token
+    gh auth status
+
+    echo "=== GitHub CLI Setup Complete! ==="
 
 # Run complete post-install setup (all steps)
 setup-all:
     #!/usr/bin/bash
     set -e
-    
+
     echo "=== Running Complete Post-Install Setup ==="
-    echo
     
-    # Step 1: Decrypt age key (if needed)
-    # just decrypt-key
-    
-    # Step 2: Setup Tailscale
-    echo "Step 1: Setting up Tailscale..."
+    echo "Step 1: Decrypting age key and applying dotfiles..."
+    just decrypt-and-apply
+
+    echo "Step 2: Setting up Tailscale..."
     just setup-tailscale
-    echo
-    
-    # Step 3: Setup GitHub CLI (if needed)
-    # echo "Step 2: Setting up GitHub CLI..."
-    # just setup-github
-    # echo
-    
+
+    echo "Step 3: Setting up GitHub CLI..."
+    just setup-github
+
     echo "=== All Setup Steps Complete! ==="

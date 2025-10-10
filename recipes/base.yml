@@ -107,6 +107,7 @@ install:
     - wmctrl
     - ydotool
     - yt-dlp
+    - yq
     # Sytem Portals
     # - better-settings
     - dbus-daemon

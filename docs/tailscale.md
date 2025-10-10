@@ -39,9 +39,6 @@ Click **Save**.
 
 ---
 
-[TODO!!!] THIS NEEDS REVISION we moved on to more direct approach
-instead the user should just be updating their chezmoi file (pre-encryption)
-
 ## Step 3: Save Credentials to USB
 
 Create a file on your USB:

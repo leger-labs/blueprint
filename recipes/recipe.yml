@@ -54,7 +54,7 @@ modules:
   - type: chezmoi
     repository: "https://github.com/mecattaf/dotfiles"
     run-every: '1d'
-    wait-after-boot: '5m'
+    wait-after-boot: '15m' # longer wait after first boot to run just setup all
     disable-init: false
     disable-update: false
 
