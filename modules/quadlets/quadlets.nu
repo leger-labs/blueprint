@@ -38,11 +38,17 @@ def main [configStr: string] {
         exit 1
     }
 
+    print ""
+    print $"(ansi cyan_bold)═══════════════════════════════════════════════════════════════(ansi reset)"
+    print $"(ansi cyan_bold)  BlueBuild Quadlets Module - Setup(ansi reset)"
+    print $"(ansi cyan_bold)═══════════════════════════════════════════════════════════════(ansi reset)"
+    print ""
+
     # Merge with defaults
     let configurations = $config.configurations | each {|configuration|
         mut merged = $defaultConfiguration | merge $configuration
         
-        print $"Processing quadlet: (ansi default_italic)($merged.name)(ansi reset)"
+        print $"(ansi green_bold)▶(ansi reset) Processing quadlet: (ansi default_italic)($merged.name)(ansi reset)"
         
         # Validate required fields
         if ($merged.name | is-empty) {
@@ -65,37 +71,37 @@ def main [configStr: string] {
         if ($merged.source | str starts-with "http") {
             # Git source
             if ($merged.managed-externally) {
-                print $"(ansi yellow_bold)Warning(ansi reset): Git source with managed-externally flag for ($merged.name)"
-                print "  Git sources are automatically managed. The managed-externally flag will be ignored."
+                print $"(ansi yellow_bold)  ⚠ Warning(ansi reset): Git source with managed-externally flag for ($merged.name)"
+                print "    Git sources are automatically managed. The managed-externally flag will be ignored."
             }
             
-            print $"  Downloading from Git: ($merged.source)"
+            print $"  📦 Downloading from Git: ($merged.source)"
             let result = (do {
                 nu $"($env.MODULE_DIRECTORY)/quadlets/git-source-parser.nu" ($merged.source) ($merged.branch) ($merged.name)
             } | complete)
             
             if $result.exit_code != 0 {
-                print $"(ansi red_bold)Error downloading quadlet(ansi reset): ($merged.name)"
+                print $"(ansi red_bold)  ✗ Error downloading quadlet(ansi reset): ($merged.name)"
                 print $result.stderr
                 exit 1
             }
             
-            # Validate downloaded quadlets
-            print $"  Validating quadlet files"
+            # Validation with dependency analysis
+            print $"  🔍 Validating quadlet files (with dependency analysis)"
             let validateResult = (do {
-                nu $"($env.MODULE_DIRECTORY)/quadlets/quadlet-validator.nu" ($merged.name)
+                nu $"($env.MODULE_DIRECTORY)/quadlets/quadlet-validator.nu" ($merged.name) --check-conflicts
             } | complete)
             
             if $validateResult.exit_code != 0 {
-                print $"(ansi red_bold)Validation failed(ansi reset): ($merged.name)"
+                print $"(ansi red_bold)  ✗ Validation failed(ansi reset): ($merged.name)"
                 print $validateResult.stderr
                 exit 1
             }
             
         } else if ($merged.managed-externally) {
             # Externally managed - just record configuration
-            print $"  Externally managed quadlet - will be discovered at runtime"
-            print $"  Expected location: ($merged.source)"
+            print $"  🔐 Externally managed quadlet - will be discovered at runtime"
+            print $"  📍 Expected location: ($merged.source)"
             
         } else {
             print $"(ansi red_bold)Configuration Error(ansi reset): Local paths require managed-externally flag"
@@ -105,6 +111,7 @@ def main [configStr: string] {
         }
         
         print $"  (ansi green)✓(ansi reset) Configuration complete"
+        print ""
         $merged
     }
 
@@ -137,18 +144,25 @@ def main [configStr: string] {
         container-auto-update: $containerAutoUpdate
     } | to yaml | save -f $configPath
 
-    print ""
-    print $"(ansi green_bold)Successfully configured ($configurations | length) quadlet\(s\)(ansi reset)"
+    print $"(ansi green_bold)✓ Successfully configured ($configurations | length) quadlet\(s\)(ansi reset)"
     
-    # Set up systemd services
+    # Set up systemd services and scripts
     print ""
-    print "Setting up systemd services..."
+    print $"(ansi cyan_bold)Setting up systemd services and  features...(ansi reset)"
     
-    # Copy service files
+    # Create required directories
     mkdir /usr/lib/systemd/system/
     mkdir /usr/lib/systemd/user/
     mkdir ($libExecPath)
+    mkdir ($usrSharePath)
     
+    # Create staging and backup directories
+    mkdir /var/lib/bluebuild/quadlets/staged
+    mkdir /var/lib/bluebuild/quadlets/backups
+    mkdir /var/lib/bluebuild/quadlets/manifests
+    
+    # Copy service files
+    print "  📝 Installing systemd unit files..."
     cp $"($env.MODULE_DIRECTORY)/quadlets/post-boot/system-quadlets-setup" $"($libExecPath)/system-quadlets-setup"
     cp $"($env.MODULE_DIRECTORY)/quadlets/post-boot/system-quadlets-setup.service" /usr/lib/systemd/system/
     
@@ -164,14 +178,30 @@ def main [configStr: string] {
     cp $"($env.MODULE_DIRECTORY)/quadlets/post-boot/user-quadlets-update.service" /usr/lib/systemd/user/
     cp $"($env.MODULE_DIRECTORY)/quadlets/post-boot/user-quadlets-update.timer" /usr/lib/systemd/user/
     
-    cp $"($env.MODULE_DIRECTORY)/quadlets/post-boot/bluebuild-quadlets-manager" "/usr/bin/bluebuild-quadlets-manager"
+    # Copy scripts
+    print "  ✨ Installing module features..."
     
-    # Make scripts executable
+    # Validator
+    cp $"($env.MODULE_DIRECTORY)/quadlets/quadlet-validator.nu" $"($usrSharePath)/quadlet-validator.nu"
+    chmod +x $"($usrSharePath)/quadlet-validator.nu"
+    
+    # Staged updates manager
+    cp $"($env.MODULE_DIRECTORY)/quadlets/staged-updates.nu" $"($usrSharePath)/staged-updates.nu"
+    chmod +x $"($usrSharePath)/staged-updates.nu"
+    
+    # CLI manager
+    cp $"($env.MODULE_DIRECTORY)/quadlets/post-boot/bluebuild-quadlets-manager" "/usr/bin/bluebuild-quadlets-manager"
+    chmod +x "/usr/bin/bluebuild-quadlets-manager"
+    
+    # Git source parser (also needed by staged updates)
+    cp $"($env.MODULE_DIRECTORY)/quadlets/git-source-parser.nu" $"($usrSharePath)/git-source-parser.nu"
+    chmod +x $"($usrSharePath)/git-source-parser.nu"
+    
+    # Make all scripts executable
     chmod +x $"($libExecPath)/system-quadlets-setup"
     chmod +x $"($libExecPath)/user-quadlets-setup"
     chmod +x $"($libExecPath)/system-quadlets-update"
     chmod +x $"($libExecPath)/user-quadlets-update"
-    chmod +x "/usr/bin/bluebuild-quadlets-manager"
     
     # Enable timers
     let hasSystemQuadlets = ($configurations | any {|c| $c.scope == "system"})
@@ -215,8 +245,25 @@ def main [configStr: string] {
         }
     }
     
-    print $"(ansi green)✓(ansi reset) Systemd services configured"
+    print $"  (ansi green)✓(ansi reset) Systemd services configured"
+    print $"  (ansi green)✓(ansi reset) Module features enabled"
+    
     print ""
-    print "Quadlets module setup complete!"
-    print $"Use (ansi cyan)bluebuild-quadlets-manager(ansi reset) to manage quadlets after installation."
+    print $"(ansi cyan_bold)═══════════════════════════════════════════════════════════════(ansi reset)"
+    print $"(ansi green_bold)✓ Quadlets Module  Setup Complete!(ansi reset)"
+    print $"(ansi cyan_bold)═══════════════════════════════════════════════════════════════(ansi reset)"
+    print ""
+    print $"(antml:bold)New  Features Available:(ansi reset)"
+    print "  • Staged Updates - Safe preview before applying"
+    print "  • Backup & Restore - Automatic backups with volume support"
+    print "  • Validation - Dependency analysis & conflict detection"
+    print "  • Improved Inspection - Detailed quadlet analysis"
+    print ""
+    print $"(antml:bold)Quick Start:(ansi reset)"
+    print $"  (ansi cyan)bluebuild-quadlets-manager show(ansi reset)         - View configuration"
+    print $"  (ansi cyan)bluebuild-quadlets-manager stage all(ansi reset)    - Stage updates (safe)"
+    print $"  (ansi cyan)bluebuild-quadlets-manager diff <n>(ansi reset)  - Preview changes"
+    print $"  (ansi cyan)bluebuild-quadlets-manager apply <n>(ansi reset) - Apply updates"
+    print ""
+    print $"For full documentation, see: (ansi default_italic)README.md(ansi reset)"
 }

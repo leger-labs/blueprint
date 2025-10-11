@@ -1,305 +1,346 @@
-# Quadlets Module - Quick Reference
+# Quadlets Module - Quick Reference Card
 
-## Configuration
+## 🚀 Quick Start
 
-### Minimal
+```bash
+# View configured quadlets
+bluebuild-quadlets-manager show
+
+# Safe update workflow (RECOMMENDED)
+bluebuild-quadlets-manager stage all         # Download updates
+bluebuild-quadlets-manager diff ai-stack     # Preview changes
+bluebuild-quadlets-manager apply ai-stack    # Apply if good
+
+# Or discard if not ready
+bluebuild-quadlets-manager discard ai-stack
+```
+
+## 📖 Command Reference
+
+### Information Commands
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `show` | Show all configured quadlets | `bluebuild-quadlets-manager show` |
+| `list` | List installed with status | `bluebuild-quadlets-manager list` |
+| `inspect <n>` | Detailed analysis | `bluebuild-quadlets-manager inspect ai-stack` |
+| `status <n>` | Service status | `bluebuild-quadlets-manager status ai-stack` |
+| `logs <n>` | View logs | `bluebuild-quadlets-manager logs ai-stack --lines 100` |
+
+### Staged Updates (New Feature)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `stage [name\|all]` | Download without applying | `bluebuild-quadlets-manager stage all` |
+| `staged` | List staged updates | `bluebuild-quadlets-manager staged` |
+| `diff <n>` | Preview changes | `bluebuild-quadlets-manager diff ai-stack` |
+| `apply [name\|all]` | Apply staged updates | `bluebuild-quadlets-manager apply ai-stack` |
+| `discard [name\|all]` | Discard staged | `bluebuild-quadlets-manager discard all` |
+
+### Backup & Restore (New Feature)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `backup [name\|all]` | Create backup | `bluebuild-quadlets-manager backup all` |
+| `backups [name]` | List backups | `bluebuild-quadlets-manager backups ai-stack` |
+| `restore <n> [id]` | Restore from backup | `bluebuild-quadlets-manager restore ai-stack` |
+
+### Management
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `discover` | Find external quadlets | `bluebuild-quadlets-manager discover` |
+| `validate <n>` | Validate config | `bluebuild-quadlets-manager validate ai-stack` |
+| `check-conflicts [name]` | Check conflicts | `bluebuild-quadlets-manager check-conflicts` |
+| `enable updates` | Enable auto-updates | `bluebuild-quadlets-manager enable updates` |
+| `disable updates` | Disable auto-updates | `bluebuild-quadlets-manager disable updates` |
+| `update [name\|all]` | Direct update (legacy) | `bluebuild-quadlets-manager update all` |
+
+## 📊 Workflows
+
+### Workflow 1: Safe Production Update
+
+```
+┌─────────┐
+│  Stage  │  Download and validate updates
+└────┬────┘
+     │
+     ▼
+┌─────────┐
+│  List   │  See what's staged
+└────┬────┘
+     │
+     ▼
+┌─────────┐
+│  Diff   │  Preview exact changes
+└────┬────┘
+     │
+     ├─→ Not good? ──→ Discard ──→ Done
+     │
+     ▼ Looks good
+┌─────────┐
+│ Backup  │  Create safety net
+└────┬────┘
+     │
+     ▼
+┌─────────┐
+│  Apply  │  Apply changes (auto-backs up again)
+└────┬────┘
+     │
+     ├─→ Works? ──→ Done! 🎉
+     │
+     ▼ Broken?
+┌─────────┐
+│ Restore │  Roll back to previous version
+└─────────┘
+```
+
+### Workflow 2: Quick Development Update
+
+```
+┌─────────┐
+│ Update  │  Direct update
+└────┬────┘
+     │
+     ▼
+┌─────────┐
+│ Status  │  Check if working
+└─────────┘
+```
+
+### Workflow 3: Disaster Recovery
+
+```
+┌─────────┐
+│ Backups │  List available backups
+└────┬────┘
+     │
+     ▼
+┌─────────┐
+│ Restore │  Restore to previous state
+└────┬────┘
+     │
+     ▼
+┌─────────┐
+│ Status  │  Verify services running
+└─────────┘
+```
+
+## 🎯 Use Cases
+
+### Use Case: Stage All Updates Weekly
+
+```bash
+# Monday morning routine
+bluebuild-quadlets-manager stage all
+bluebuild-quadlets-manager staged  # Review what's available
+```
+
+### Use Case: Careful Production Update
+
+```bash
+# For critical service
+bluebuild-quadlets-manager stage openwebui
+bluebuild-quadlets-manager diff openwebui      # Review changes
+bluebuild-quadlets-manager backup openwebui    # Safety first
+bluebuild-quadlets-manager apply openwebui     # Apply
+bluebuild-quadlets-manager status openwebui    # Verify
+```
+
+### Use Case: Bulk Update with Review
+
+```bash
+# Stage everything
+bluebuild-quadlets-manager stage all
+
+# Review each one
+bluebuild-quadlets-manager diff ai-stack
+bluebuild-quadlets-manager diff monitoring
+bluebuild-quadlets-manager diff nextcloud
+
+# Apply selectively
+bluebuild-quadlets-manager apply ai-stack
+bluebuild-quadlets-manager apply monitoring
+bluebuild-quadlets-manager discard nextcloud  # Not ready
+```
+
+### Use Case: Emergency Rollback
+
+```bash
+# Service broken after update
+bluebuild-quadlets-manager backups ai-stack
+bluebuild-quadlets-manager restore ai-stack 20241010-120000
+```
+
+## 🔧 Configuration Snippets
+
+### Git-Sourced Quadlet
+
 ```yaml
-- type: quadlets
-  configurations:
-    - name: my-app
-      source: https://github.com/org/repo/tree/main/my-app
+- name: ai-stack
+  source: https://github.com/org/repo/tree/main/ai-stack
+  scope: user
+  branch: main
+  notify: true
 ```
 
-### Complete
+### Externally-Managed (Secrets)
+
 ```yaml
-- type: quadlets
-  configurations:
-    - name: my-app
-      source: https://github.com/org/repo/tree/main/my-app
-      scope: user                    # user|system
-      branch: main
-      notify: true
-      managed-externally: false
-      setup-delay: 5m
-  
-  auto-update:
-    enabled: true
-    interval: 7d
-    wait-after-boot: 5m
-  
-  container-auto-update:
-    enabled: true
-    interval: daily                  # daily|weekly|monthly
+- name: openwebui
+  source: ~/.config/containers/systemd/openwebui
+  scope: user
+  managed-externally: true
+  setup-delay: 10m
 ```
 
-## CLI Commands
+### System-Wide Service
 
-```bash
-# Information
-bluebuild-quadlets-manager show              # Show config
-bluebuild-quadlets-manager list              # List installed
-bluebuild-quadlets-manager status <name>     # Service status
-bluebuild-quadlets-manager logs <name>       # View logs
-
-# Operations
-bluebuild-quadlets-manager update <name|all> # Update quadlets
-bluebuild-quadlets-manager discover          # Find external quadlets
-bluebuild-quadlets-manager validate <name>   # Validate syntax
-
-# Control
-bluebuild-quadlets-manager enable updates    # Enable auto-update
-bluebuild-quadlets-manager disable updates   # Disable auto-update
-```
-
-## Systemctl Commands
-
-```bash
-# User Services
-systemctl --user status <name>.service
-systemctl --user start <name>.service
-systemctl --user stop <name>.service
-systemctl --user restart <name>.service
-systemctl --user daemon-reload
-
-# Timers
-systemctl --user list-timers | grep quadlets
-systemctl --user status user-quadlets-update.timer
-
-# Logs
-journalctl --user -u <name>.service -f
-journalctl --user -u user-quadlets-setup.service
-```
-
-## File Locations
-
-```bash
-# Configuration
-/usr/share/bluebuild/quadlets/configuration.yaml
-
-# User quadlets
-~/.config/containers/systemd/<name>/
-
-# System quadlets
-/etc/containers/systemd/<name>/
-
-# Scripts
-/usr/libexec/bluebuild/quadlets/
-
-# CLI
-/usr/bin/bluebuild-quadlets-manager
-```
-
-## Podman Commands
-
-```bash
-# Containers
-podman ps                           # List running
-podman ps -a                        # List all
-podman logs <container>             # View logs
-podman exec -it <container> bash    # Shell access
-
-# Images
-podman images                       # List images
-podman pull <image>                 # Pull image
-podman auto-update --dry-run        # Check for updates
-podman auto-update                  # Update containers
-
-# Volumes
-podman volume ls                    # List volumes
-podman volume inspect <volume>      # Inspect volume
-podman volume export <volume>       # Backup volume
-podman volume import <volume>       # Restore volume
-
-# Pods
-podman pod ps                       # List pods
-podman pod inspect <pod>            # Inspect pod
-podman pod start <pod>              # Start pod
-podman pod stop <pod>               # Stop pod
-```
-
-## Common Tasks
-
-### Add a New Quadlet
 ```yaml
-# In recipe.yml
-- type: quadlets
-  configurations:
-    - name: new-app
-      source: https://github.com/org/repo/tree/main/new-app
+- name: monitoring
+  source: https://github.com/org/repo/tree/main/monitoring
+  scope: system
+  notify: false
 ```
-Rebuild image and rebase.
 
-### Update a Quadlet
+## 📁 Important Paths
+
+### Configuration
+- `/usr/share/bluebuild/quadlets/configuration.yaml` - Module config
+- `/usr/bin/bluebuild-quadlets-manager` - CLI tool
+
+### Runtime (User)
+- `~/.config/containers/systemd/<n>/` - Active quadlets
+
+### Runtime (System)
+- `/etc/containers/systemd/<n>/` - Active quadlets
+
+### Enhanced Features
+- `/var/lib/bluebuild/quadlets/staged/` - Staged updates
+- `/var/lib/bluebuild/quadlets/backups/` - Backups with volumes
+- `/var/lib/bluebuild/quadlets/manifests/` - Metadata
+
+## 🚨 Troubleshooting Quick Fixes
+
+### Problem: Service won't start
+
 ```bash
-bluebuild-quadlets-manager update new-app
+bluebuild-quadlets-manager status <n>
+bluebuild-quadlets-manager logs <n>
+bluebuild-quadlets-manager validate <n>
 ```
 
-### Check Why Service Failed
+### Problem: Port conflict
+
 ```bash
-systemctl --user status app.service
-journalctl --user -u app.service -n 50
-podman ps -a | grep app
-podman logs app-container
+bluebuild-quadlets-manager check-conflicts <n>
+ss -tlnp | grep <port>  # Find what's using it
 ```
 
-### Backup Container Data
+### Problem: Update broke something
+
 ```bash
-podman volume export app-data > app-data-backup.tar
+bluebuild-quadlets-manager backups <n>
+bluebuild-quadlets-manager restore <n>
 ```
 
-### Restore Container Data
+### Problem: Want to undo staged update
+
 ```bash
-podman volume import app-data < app-data-backup.tar
+bluebuild-quadlets-manager discard <n>
 ```
 
-### Change Container Port
-Edit `.container` file:
-```ini
-PublishPort=8080:80  # Change to desired port
-```
-Then:
+## 💡 Pro Tips
+
+### Tip 1: Always Stage First
 ```bash
-systemctl --user daemon-reload
-systemctl --user restart app.service
+# Don't do this in production
+bluebuild-quadlets-manager update all  # RISKY
+
+# Do this instead
+bluebuild-quadlets-manager stage all
+bluebuild-quadlets-manager apply all   # SAFE
 ```
 
-## Troubleshooting
-
-### Service Won't Start
+### Tip 2: Regular Backups
 ```bash
-# Check quadlet syntax
-podman generate systemd --files <container>
+# Weekly backup routine
+bluebuild-quadlets-manager backup all
 
-# Check systemd logs
-journalctl --user -xe
-
-# Test manually
-podman run --rm -it <image> bash
+# Or add to crontab
+0 0 * * 0 bluebuild-quadlets-manager backup all
 ```
 
-### Updates Not Working
+### Tip 3: Check Before Applying
 ```bash
-# Check timer
-systemctl --user list-timers | grep quadlets
+# Always diff before apply
+bluebuild-quadlets-manager diff <n>
 
-# Manually trigger
-bluebuild-quadlets-manager update all
-
-# Check logs
-journalctl --user -u user-quadlets-update.service
+# Look for:
+# - New ports (conflicts?)
+# - Changed images (breaking changes?)
+# - New volumes (migration needed?)
 ```
 
-### Git Clone Fails
+### Tip 4: Test in User Scope First
+```yaml
+# Test with scope: user
+- name: test-service
+  scope: user
+
+# Then promote to system if good
+- name: prod-service
+  scope: system
+```
+
+### Tip 5: Keep Backups for 7+ Days
 ```bash
-# Test Git access
-git clone <repo-url>
+# Backups are cheap, disasters are expensive
+# Keep at least a week of backups
 
-# Check network
-ping github.com
-
-# Verify URL in config
-cat /usr/share/bluebuild/quadlets/configuration.yaml
+# Cleanup old backups manually
+ls -lt /var/lib/bluebuild/quadlets/backups/*/
 ```
 
-### Port Already in Use
+## 📚 Learning Resources
+
+- **Full Documentation**: README.md
+- **Implementation Details**: IMPLEMENTATION-GUIDE.md
+- **Examples**: examples/ directory
+
+## 📊 Cheat Sheet
+
+### Most Common Commands
+
 ```bash
-# Find what's using the port
-ss -tlnp | grep <port>
+# Daily checks
+bluebuild-quadlets-manager list
 
-# Change port in .container file
-# Then reload and restart
+# Weekly updates
+bluebuild-quadlets-manager stage all
+bluebuild-quadlets-manager apply all
+
+# Monthly backup
+bluebuild-quadlets-manager backup all
+
+# When things break
+bluebuild-quadlets-manager restore <n>
 ```
 
-## Quadlet File Syntax
+### Key Features
 
-### Container
-```ini
-[Unit]
-Description=My App
-
-[Container]
-ContainerName=my-app
-Image=docker.io/library/image:tag
-PublishPort=8080:80
-Volume=my-data:/data:Z
-Label=io.containers.autoupdate=registry
-
-[Service]
-Restart=always
-
-[Install]
-WantedBy=default.target
-```
-
-### Pod
-```ini
-[Pod]
-PodName=my-pod
-PublishPort=8080:80
-```
-
-### Network
-```ini
-[Network]
-NetworkName=my-network
-```
-
-### Volume
-```ini
-[Volume]
-VolumeName=my-data
-```
-
-## Environment Variables
-
-### In .container file
-```ini
-Environment=KEY=value
-EnvironmentFile=%h/.config/app/.env
-```
-
-### Using Secrets
-```bash
-# Create secret
-echo "secret-value" | podman secret create my-secret -
-
-# Use in .container
-Secret=my-secret,type=env,target=SECRET_KEY
-```
-
-## Best Practices
-
-✅ Use `managed-externally` for secrets
-✅ Enable `Label=io.containers.autoupdate=registry`
-✅ Set appropriate `setup-delay` for external quadlets
-✅ Use health checks in containers
-✅ Backup volumes regularly
-✅ Test in user scope before system scope
-✅ Use descriptive quadlet names
-✅ Document custom configurations
-
-❌ Don't store secrets in Git unencrypted
-❌ Don't use `scope: system` unnecessarily
-❌ Don't skip health checks
-❌ Don't ignore update failures
-❌ Don't hardcode paths (use `%h` for home)
-
-## Resources
-
-- Podman Quadlet Docs: https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html
-- Podman Auto-Update: https://docs.podman.io/en/latest/markdown/podman-auto-update.1.html
-- Module README: See README.md
-- Examples: See examples/ directory
-- Testing: See TESTING.md
-
-## Getting Help
-
-1. Check logs: `journalctl --user -xe`
-2. Validate config: `bluebuild-quadlets-manager validate <name>`
-3. Test manually: `podman run --rm -it <image>`
-4. Review docs: README.md, INSTALLATION.md
-5. Ask community: BlueBuild Discord
+| Feature | Legacy | Enhanced |
+|---------|--------|----------|
+| Update | `update all` | `stage all` → `apply all` |
+| Preview | ❌ | `diff <n>` |
+| Backup | ❌ | `backup <n>` |
+| Restore | ❌ | `restore <n>` |
+| Validate | Basic | Enhanced with conflicts |
 
 ---
 
-**Quick Start**: Add to recipe.yml → Build → Rebase → Reboot → Verify with `bluebuild-quadlets-manager show`
+**Remember**: 
+- 🟢 **Stage First** - Safer than direct update
+- 🟢 **Backup Often** - Before major changes
+- 🟢 **Diff Always** - Know what's changing
+- 🟢 **Test in User** - Before system-wide deployment
