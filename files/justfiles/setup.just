@@ -129,6 +129,25 @@ setup-github:
 
     echo "=== GitHub CLI Setup Complete! ==="
 
+# Install Claude Code CLI
+install-claude-code:
+    #!/usr/bin/bash
+    set -e
+
+    echo "=== Installing Claude Code CLI ==="
+
+    SCRIPT_PATH="/usr/share/blueprint/scripts/claude-code.sh"
+
+    if [ -f "$SCRIPT_PATH" ]; then
+        bash "$SCRIPT_PATH"
+    else
+        echo "❌ Claude Code installer script not found at $SCRIPT_PATH"
+        echo "Attempting direct installation..."
+        curl -fsSL https://claude.ai/install.sh | bash
+    fi
+
+    echo "=== Claude Code CLI Installation Complete! ==="
+
 # Run complete post-install setup (all steps)
 setup-all:
     #!/usr/bin/bash

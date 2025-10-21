@@ -39,6 +39,10 @@ modules:
       - source: system
         destination: /
 
+  - type: script
+    scripts:
+      - claude-code.sh
+
   - from-file: fonts.yml
 
   - type: systemd
