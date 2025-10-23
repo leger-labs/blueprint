@@ -169,3 +169,5 @@ install:
     - cockpit-storaged
     - cockpit-system
     - pcp-zeroconf
+    # testing
+    - warp-terminal
