@@ -159,7 +159,6 @@ install:
     - python3-setproctitle
     # networking
     - caddy
-    - tailscale
     - systemd-resolved
     - cockpit
     - cockpit-machines
@@ -169,5 +168,3 @@ install:
     - cockpit-storaged
     - cockpit-system
     - pcp-zeroconf
-    # testing
-    - warp

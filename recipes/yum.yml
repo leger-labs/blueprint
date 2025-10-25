@@ -1,0 +1,6 @@
+type: dnf
+install:
+  packages:
+    - tailscale
+    - leger
+    - warp

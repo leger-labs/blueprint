@@ -1,0 +1,7 @@
+[leger]
+name=Leger Packages
+baseurl=https://pkgs.leger.run/fedora/leger/
+enabled=1
+gpgcheck=1
+repo_gpgcheck=0
+gpgkey=https://pkgs.leger.run/fedora/leger-rpm-signing.public.asc
