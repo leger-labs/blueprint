@@ -1,6 +1,6 @@
 [leger]
 name=Leger Packages
-baseurl=https://pkgs.leger.run/fedora/
+baseurl=https://pkgs.leger.run/fedora/$basearch
 enabled=1
 gpgcheck=1
 repo_gpgcheck=0
