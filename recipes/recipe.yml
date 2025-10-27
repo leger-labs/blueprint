@@ -14,7 +14,6 @@ modules:
 # - amdgpu.gttsize=131072     → 128 GiB unified memory (131072 MiB)
 # - ttm.pages_limit=33554432  → 128 GiB pinned memory (33554432 × 4 KiB)
 
-
   - type: files
     files:
       - source: system
@@ -42,7 +41,7 @@ modules:
         - subscription-manager-rhsm-certificates 
 
     - type: script
-    scripts:
+      scripts:
       - claude-code.sh
 
   - from-file: fonts.yml
