@@ -2,6 +2,7 @@
 name=Leger Packages
 baseurl=https://pkgs.leger.run/fedora/$basearch
 enabled=1
-gpgcheck=1
+type=rpm
 repo_gpgcheck=0
+gpgcheck=0
 gpgkey=https://pkgs.leger.run/fedora/repo.gpg
