@@ -40,8 +40,8 @@ modules:
         - subscription-manager 
         - subscription-manager-rhsm-certificates 
 
-    - type: script
-      scripts:
+  - type: script
+    scripts:
       - claude-code.sh
 
   - from-file: fonts.yml
