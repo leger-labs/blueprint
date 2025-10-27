@@ -381,13 +381,13 @@ jobs:
     
     steps:
       - name: Download ISO Artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: blueprint-iso-${{ needs.build-iso.outputs.timestamp }}
           path: ./release-assets
 
       - name: Download Changelog
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: changelog-${{ needs.build-iso.outputs.timestamp }}
           path: ./
