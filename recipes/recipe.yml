@@ -54,6 +54,7 @@ modules:
         - enable-linger.service
         - autologin.service
         - tailscaled.service
+        - legerd.service
         - systemd-resolved.service
       disabled: []
 
