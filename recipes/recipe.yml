@@ -22,6 +22,7 @@ modules:
   - from-file: base.yml
   - from-file: yum.yml
   - from-file: copr.yml
+  - from-file: duo.yml
   - from-file: quickshell.yml
 
   - type: dnf
