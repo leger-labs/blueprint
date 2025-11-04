@@ -44,62 +44,6 @@ decrypt-and-apply:
         echo "⚠️ chezmoi not installed — skipping dotfiles application"
     fi
 
-# Setup Tailscale using OAuth credentials from environment
-setup-tailscale:
-    #!/usr/bin/bash
-    set -e
-
-    echo "=== Tailscale Auto-Setup with OAuth ==="
-    
-    if [ -f "$HOME/.env" ]; then
-        source "$HOME/.env"
-        echo "✓ Environment variables loaded from ~/.env"
-    else
-        echo "❌ Error: ~/.env not found"
-        exit 1
-    fi
-
-    if [ -z "$TAILSCALE_OAUTH_CLIENT_ID" ] || [ -z "$TAILSCALE_OAUTH_CLIENT_SECRET" ]; then
-        echo "❌ Error: Tailscale OAuth credentials missing"
-        exit 1
-    fi
-
-    echo "Enabling Tailscale service..."
-    sudo systemctl enable --now tailscaled
-
-    echo "Generating fresh auth key..."
-    AUTH_KEY_RESPONSE=$(curl -s -X POST \
-        "https://api.tailscale.com/api/v2/tailnet/-/keys" \
-        -u "${TAILSCALE_OAUTH_CLIENT_ID}:${TAILSCALE_OAUTH_CLIENT_SECRET}" \
-        -H "Content-Type: application/json" \
-        -d '{
-            "capabilities": {
-                "devices": {
-                    "create": {
-                        "reusable": false,
-                        "ephemeral": false,
-                        "preauthorized": true,
-                        "tags": ["tag:blueprint"]
-                    }
-                }
-            },
-            "expirySeconds": 900
-        }')
-    
-    AUTH_KEY=$(echo "$AUTH_KEY_RESPONSE" | jq -r '.key')
-
-    if [ -z "$AUTH_KEY" ] || [ "$AUTH_KEY" = "null" ]; then
-        echo "❌ Failed to generate auth key"
-        echo "Response: $AUTH_KEY_RESPONSE"
-        exit 1
-    fi
-
-    echo "Authenticating with Tailscale..."
-    sudo tailscale up --authkey="$AUTH_KEY" --accept-routes --accept-dns
-
-    echo "=== Tailscale Setup Complete! ==="
-    tailscale status
-
 # Setup GitHub CLI using GH_TOKEN from environment
 setup-github:
     #!/usr/bin/bash
@@ -129,25 +73,6 @@ setup-github:
 
     echo "=== GitHub CLI Setup Complete! ==="
 
-# Install Claude Code CLI
-install-claude-code:
-    #!/usr/bin/bash
-    set -e
-
-    echo "=== Installing Claude Code CLI ==="
-
-    SCRIPT_PATH="/usr/share/blueprint/scripts/claude-code.sh"
-
-    if [ -f "$SCRIPT_PATH" ]; then
-        bash "$SCRIPT_PATH"
-    else
-        echo "❌ Claude Code installer script not found at $SCRIPT_PATH"
-        echo "Attempting direct installation..."
-        curl -fsSL https://claude.ai/install.sh | bash
-    fi
-
-    echo "=== Claude Code CLI Installation Complete! ==="
-
 # Run complete post-install setup (all steps)
 setup-all:
     #!/usr/bin/bash
@@ -158,10 +83,7 @@ setup-all:
     echo "Step 1: Decrypting age key and applying dotfiles..."
     just decrypt-and-apply
 
-    echo "Step 2: Setting up Tailscale..."
-    just setup-tailscale
-
-    echo "Step 3: Setting up GitHub CLI..."
+    echo "Step 2: Setting up GitHub CLI..."
     just setup-github
 
     echo "=== All Setup Steps Complete! ==="
