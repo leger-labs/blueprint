@@ -1,0 +1,8 @@
+type: dnf
+repos:
+  copr:
+    - scottames/vicinae
+install:
+  packages:
+    - vicinae
+
