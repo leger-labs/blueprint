@@ -23,7 +23,7 @@ modules:
   - from-file: yum.yml
   - from-file: copr.yml
   - from-file: duo.yml
-  - from-file: quickshell.yml
+  - from-file: dms.yml
 
   - type: dnf
     remove:
@@ -84,7 +84,6 @@ modules:
           - com.obsproject.Studio
           - com.obsproject.Studio.Plugin.OBSVkCapture
           - org.gnome.Lollypop
-          - org.mozilla.firefox
           # - org.freedesktop.Platform.VulkanLayer.OBSVkCapture
           # - org.freedesktop.Platform.GStreamer.gstreamer-vaapi
 

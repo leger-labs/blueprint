@@ -1,0 +1,8 @@
+type: dnf
+repos:
+  copr:
+    - avengemedia/dms
+install:
+  packages:
+    - dms 
+    - dms-greeter
