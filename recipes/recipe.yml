@@ -24,6 +24,7 @@ modules:
   - from-file: copr.yml
   - from-file: duo.yml
   - from-file: dms.yml
+  - from-file: vicinae.yml
 
   - type: dnf
     remove:
