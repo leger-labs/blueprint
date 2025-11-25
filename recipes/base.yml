@@ -176,3 +176,11 @@ install:
     - kmscube 
     - mesa-demos
     - radeontop
+
+    # qtwebengine items
+    - qt6-qtwebengine
+    - qt6-qtwebengine-devel
+    - qt6-qtwebchannel 
+    - qt6-qtwebchannel-devel
+    - qt6-qtdeclarative 
+    - qt6-qtdeclarative-devel
