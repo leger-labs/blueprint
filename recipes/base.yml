@@ -168,3 +168,5 @@ install:
     - cockpit-storaged
     - cockpit-system
     - pcp-zeroconf
+    # Gamescope
+    - gamescope
