@@ -170,3 +170,8 @@ install:
     - pcp-zeroconf
     # Gamescope
     - gamescope
+    # Benchmarking suite
+    - glmark2 
+    - weston 
+    - kmscube 
+    - mesa-demos
