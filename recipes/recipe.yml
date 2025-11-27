@@ -3,7 +3,7 @@
 name: blueprint
 description: The next-generation Fedora-based workstation — built for the Framework Desktop with AMD Ryzen™ 9 395 Max+ with 128GB RAM
 base-image: ghcr.io/ublue-os/base-main
-image-version: 42
+image-version: 43
 
 modules:
   - type: kargs
