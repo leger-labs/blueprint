@@ -26,7 +26,7 @@ modules:
   - from-file: packages.yml
 # official dms, can be used as fallback
 #  - from-file: dms.yml
-  - from-file: vicinae.yml
+#  - from-file: vicinae.yml
 
   - type: dnf
     remove:
