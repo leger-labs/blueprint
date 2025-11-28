@@ -4,4 +4,5 @@ repos:
     - mecattaf/packages
 install:
   packages:
-    - quickshell-webengine
+    - dms
+    - dms-greeter
