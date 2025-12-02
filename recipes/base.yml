@@ -188,8 +188,8 @@ install:
     - qt6-qtwebchannel-devel
     - qt6-qtshadertools-devel
     # poc0
-    - wlroots-devel wayland-devel wayland-protocols-devel 
-    - wayland-devel wayland-protocols-devel 
+    - wlroots-devel
+    - wayland-devel
     - wayland-protocols-devel 
     - libdrm-devel 
     - pixman-devel 
