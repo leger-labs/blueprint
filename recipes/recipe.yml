@@ -23,9 +23,9 @@ modules:
   - from-file: yum.yml
   - from-file: copr.yml
   - from-file: duo.yml
-  - from-file: packages.yml
+# - from-file: packages.yml
 # official dms, can be used as fallback
-#  - from-file: dms.yml
+  - from-file: dms.yml
 #  - from-file: vicinae.yml
 
   - type: dnf

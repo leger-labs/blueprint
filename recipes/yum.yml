@@ -3,3 +3,4 @@ install:
   packages:
     - tailscale
     - leger
+    - antigravity
