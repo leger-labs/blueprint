@@ -178,3 +178,12 @@ install:
     - qt6-qtwebengine
     - qt6-qtwebchannel 
     - qt6-qtdeclarative 
+    - qt6-qtbase
+    - qt6-qtdeclarative
+    - qt6-qtquickcontrols2
+    - qt6-qtbase-devel
+    - qt6-qtdeclarative-devel
+    - qt6-qtquickcontrols2-devel
+    - qt6-qtwebengine-devel
+    - qt6-qtwebchannel-devel
+    - qt6-qtshadertools-devel
