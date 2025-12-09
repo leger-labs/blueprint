@@ -174,24 +174,5 @@ install:
     - kmscube 
     - mesa-demos
     - radeontop
-    # qtwebengine items
-    - qt6-qtwebengine
-    - qt6-qtwebchannel 
-    - qt6-qtdeclarative 
-    - qt6-qtbase
-    - qt6-qtdeclarative
-    - qt6-qtquickcontrols2
-    - qt6-qtbase-devel
-    - qt6-qtdeclarative-devel
-    - qt6-qtquickcontrols2-devel
-    - qt6-qtwebengine-devel
-    - qt6-qtwebchannel-devel
-    - qt6-qtshadertools-devel
-    # poc0
-    - wlroots-devel
-    - wayland-devel
-    - wayland-protocols-devel 
-    - libdrm-devel 
-    - pixman-devel 
-    - libxkbcommon-devel 
-    - qwlroots-devel
+    # Gamescope
+    - gamescope
