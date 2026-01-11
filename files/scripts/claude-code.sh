@@ -4,14 +4,7 @@
 
 set -euo pipefail
 
-# Fetch official installer and extract GCS bucket URL
-INSTALLER=$(curl -fsSL https://claude.ai/install.sh)
-GCS_BUCKET=$(echo "$INSTALLER" | grep 'GCS_BUCKET=' | cut -d'"' -f2)
-
-if [[ -z "$GCS_BUCKET" ]]; then
-  echo "Error: Could not extract GCS bucket URL from installer" >&2
-  exit 1
-fi
+GCS_BUCKET="https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases"
 
 VERSION=$(curl -fsSL "$GCS_BUCKET/latest")
 
